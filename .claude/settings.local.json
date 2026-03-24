@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(file /Users/barboza/Downloads/218628-218631-218626-Driver/*)",
+      "Bash(du -sh /Users/barboza/Downloads/218628-218631-218626-Driver/*)",
+      "Bash(lpstat -a)",
+      "Bash(lpoptions -p Xprinter_XP_T271U)",
+      "Bash(lpoptions -p Xprinter_XP_T271U -l)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_2 -l)",
+      "Bash(lp --help)",
+      "Bash(npm --version)",
+      "Bash(convert --version)",
+      "Bash(sips --help)",
+      "Bash(npm list:*)",
+      "Bash(lpstat -p)",
+      "Bash(lpstat -s)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

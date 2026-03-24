@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(lpstat -p -d)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_4 -l)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_4)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_4 -o PageSize=Custom.150x100mm)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_4 -o PaperType=LabelGaps)",
+      "Bash(lpoptions -p Xprinter_XP_T271U_4 -o GapsHeight=1)"
+    ]
+  }
+}

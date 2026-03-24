@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XP-T271U — Editor de Etiquetas</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Libs externas via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-brand">
+      <span class="header-icon">🖨️</span>
+      <span>XP-T271U — Editor de Etiquetas</span>
+    </div>
+    <div class="header-status" id="status-bar">Conectando...</div>
+  </header>
+
+  <main>
+    <!-- ── PAINEL ESQUERDO ── -->
+    <aside class="panel-left">
+      <!-- Tamanho do papel -->
+      <section class="section">
+        <h3>Tamanho da Etiqueta</h3>
+        <select id="sel-paper" class="input-full">
+          <option value="w2h4">2" × 4" (50 × 100mm)</option>
+          <option value="w4h4">4" × 4" (100 × 100mm)</option>
+          <option value="w4h6" selected>4" × 6" (100 × 150mm)</option>
+          <option value="custom">Personalizado</option>
+        </select>
+        <div id="custom-size" class="custom-size hidden">
+          <div class="row-2">
+            <label>Largura (mm)<input type="number" id="custom-w" value="100" min="10" max="200" /></label>
+            <label>Altura (mm)<input type="number" id="custom-h" value="150" min="10" max="400" /></label>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-apply-custom">Aplicar</button>
+        </div>
+      </section>
+
+      <!-- Adicionar elementos -->
+      <section class="section">
+        <h3>Adicionar Elemento</h3>
+        <div class="btn-grid">
+          <button class="btn btn-add" id="btn-add-text">📝 Texto</button>
+          <button class="btn btn-add" id="btn-add-barcode">▌▌ Código de Barras</button>
+          <button class="btn btn-add" id="btn-add-qr">⬛ QR Code</button>
+          <button class="btn btn-add" id="btn-add-image">🖼️ Imagem</button>
+        </div>
+        <input type="file" id="input-image" accept="image/*" class="hidden" />
+      </section>
+
+      <!-- Propriedades do elemento selecionado -->
+      <section class="section" id="props-section" style="display:none">
+        <h3>Propriedades</h3>
+        <div id="props-text" class="props-group hidden">
+          <label>Texto
+            <textarea id="prop-text-value" rows="3"></textarea>
+          </label>
+          <label>Tamanho da Fonte
+            <input type="number" id="prop-font-size" value="24" min="8" max="200" />
+          </label>
+          <label>Família da Fonte
+            <select id="prop-font-family">
+              <option value="Arial">Arial</option>
+              <option value="'Courier New'">Courier New</option>
+              <option value="'Times New Roman'">Times New Roman</option>
+              <option value="Impact">Impact</option>
+              <option value="monospace">Monospace</option>
+            </select>
+          </label>
+          <div class="row-2">
+            <label>Negrito
+              <input type="checkbox" id="prop-bold" />
+            </label>
+            <label>Itálico
+              <input type="checkbox" id="prop-italic" />
+            </label>
+          </div>
+          <label>Alinhamento
+            <select id="prop-text-align">
+              <option value="left">Esquerda</option>
+              <option value="center">Centro</option>
+              <option value="right">Direita</option>
+            </select>
+          </label>
+          <label>Cor
+            <input type="color" id="prop-color" value="#000000" />
+          </label>
+        </div>
+
+        <div id="props-barcode" class="props-group hidden">
+          <label>Valor
+            <input type="text" id="prop-barcode-value" placeholder="123456789" />
+          </label>
+          <label>Formato
+            <select id="prop-barcode-format">
+              <option value="CODE128">Code 128</option>
+              <option value="CODE39">Code 39</option>
+              <option value="EAN13">EAN-13</option>
+              <option value="EAN8">EAN-8</option>
+              <option value="UPC">UPC-A</option>
+              <option value="ITF14">ITF-14</option>
+            </select>
+          </label>
+          <label>Mostrar Texto
+            <input type="checkbox" id="prop-barcode-text" checked />
+          </label>
+        </div>
+
+        <div id="props-qr" class="props-group hidden">
+          <label>Conteúdo
+            <textarea id="prop-qr-value" rows="3" placeholder="https://exemplo.com"></textarea>
+          </label>
+          <label>Correção de Erro
+            <select id="prop-qr-ec">
+              <option value="L">L (7%)</option>
+              <option value="M" selected>M (15%)</option>
+              <option value="Q">Q (25%)</option>
+              <option value="H">H (30%)</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Controles comuns de posição/tamanho -->
+        <div id="props-common" class="props-group">
+          <div class="row-2">
+            <label>X (px)<input type="number" id="prop-x" /></label>
+            <label>Y (px)<input type="number" id="prop-y" /></label>
+          </div>
+          <div class="row-2">
+            <label>Largura<input type="number" id="prop-w" /></label>
+            <label>Altura<input type="number" id="prop-h" /></label>
+          </div>
+          <div class="btn-grid" style="margin-top:8px">
+            <button class="btn btn-secondary btn-sm" id="btn-bring-front">↑ Frente</button>
+            <button class="btn btn-secondary btn-sm" id="btn-send-back">↓ Fundo</button>
+          </div>
+          <button class="btn btn-danger btn-sm" id="btn-delete-el" style="margin-top:8px;width:100%">🗑 Remover</button>
+        </div>
+      </section>
+
+      <!-- Templates -->
+      <section class="section">
+        <h3>Templates</h3>
+        <div class="btn-grid">
+          <button class="btn btn-tpl-save" id="btn-save-template">💾 Salvar Template</button>
+          <button class="btn btn-tpl-open" id="btn-open-templates">📂 Meus Templates</button>
+        </div>
+      </section>
+
+      <!-- Ações da etiqueta -->
+      <section class="section">
+        <h3>Etiqueta</h3>
+        <div class="btn-grid">
+          <button class="btn btn-secondary btn-sm" id="btn-clear">🗑 Limpar Tudo</button>
+          <button class="btn btn-secondary btn-sm" id="btn-export">💾 Exportar PNG</button>
+        </div>
+        <label style="margin-top:8px;display:block">Zoom
+          <input type="range" id="zoom-slider" min="20" max="100" value="50" />
+        </label>
+      </section>
+    </aside>
+
+    <!-- ── ÁREA CENTRAL: CANVAS ── -->
+    <section class="canvas-area">
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="label-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- ── PAINEL DIREITO: IMPRESSÃO ── -->
+    <aside class="panel-right">
+      <section class="section">
+        <h3>Configurações de Impressão</h3>
+
+        <label>Impressora
+          <select id="sel-printer" class="input-full">
+            <option value="Xprinter_XP_T271U_4">XP-T271U (padrão)</option>
+          </select>
+        </label>
+
+        <label>Tipo de Papel
+          <select id="sel-paper-type" class="input-full">
+            <option value="LabelGaps" selected>Etiqueta com Gap</option>
+            <option value="LabelMark">Etiqueta com Marca</option>
+            <option value="Normal">Normal</option>
+            <option value="Continue">Contínuo</option>
+          </select>
+        </label>
+
+        <label>Ação Pós-Impressão
+          <select id="sel-post-action" class="input-full">
+            <option value="TearOff" selected>Avançar (Rasgo)</option>
+            <option value="Cut">Corte Total</option>
+            <option value="PartialCut">Corte Parcial</option>
+            <option value="PeelOff">Descolagem</option>
+            <option value="None">Nenhuma</option>
+          </select>
+        </label>
+
+        <label>Escuridão: <span id="darkness-val">7</span>
+          <input type="range" id="sel-darkness" min="0" max="15" value="7" />
+        </label>
+
+        <label>Velocidade: <span id="speed-val">5</span>
+          <input type="range" id="sel-speed" min="1" max="5" value="5" />
+        </label>
+
+        <label>Altura do Gap: <span id="gaps-val">1</span>
+          <input type="range" id="sel-gaps" min="0" max="10" value="1" />
+        </label>
+
+        <label>Cópias
+          <input type="number" id="sel-copies" value="1" min="1" max="99" class="input-full" />
+        </label>
+      </section>
+
+      <section class="section">
+        <button class="btn btn-print" id="btn-print">
+          🖨️ Imprimir
+        </button>
+        <div id="print-result" class="print-result hidden"></div>
+      </section>
+
+      <section class="section">
+        <h3>Atalhos</h3>
+        <div class="shortcuts">
+          <span><kbd>Delete</kbd> Remover elemento</span>
+          <span><kbd>↑↓←→</kbd> Mover 1px</span>
+          <span><kbd>Shift+↑↓←→</kbd> Mover 10px</span>
+          <span><kbd>Esc</kbd> Desselecionar</span>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Modal de Templates -->
+  <div id="templates-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>📂 Meus Templates</h2>
+        <button class="btn-close-modal" id="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="template-grid" class="template-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (ordem importa) -->
+  <script src="js/state.js"></script>
+  <script src="js/elements.js"></script>
+  <script src="js/canvas-editor.js"></script>
+  <script src="js/drag-drop.js"></script>
+  <script src="js/props-panel.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
