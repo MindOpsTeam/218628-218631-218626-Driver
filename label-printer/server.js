@@ -189,6 +189,20 @@ app.post('/print', async (req, res) => {
 // Inicia servidor
 // ──────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`\n✅ Servidor rodando em http://localhost:${PORT}\n`);
+app.listen(PORT, '0.0.0.0', () => {
+  const nets = os.networkInterfaces();
+  const ips = [];
+  for (const iface of Object.values(nets)) {
+    for (const cfg of iface) {
+      if (cfg.family === 'IPv4' && !cfg.internal) ips.push(cfg.address);
+    }
+  }
+  console.log(`\n✅ Servidor rodando em:`);
+  console.log(`   Local:  http://localhost:${PORT}`);
+  console.log(`   Check-in: http://localhost:${PORT}/checkin.html`);
+  if (ips.length) {
+    console.log(`\n📱 Acesso na rede (celular):`);
+    ips.forEach(ip => console.log(`   http://${ip}:${PORT}/checkin.html`));
+  }
+  console.log();
 });
